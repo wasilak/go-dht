@@ -116,5 +116,9 @@ func main() {
 	recordMetrics(dhtInstance, pin, model)
 
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(k.String("listen"), nil)
+
+	err = http.ListenAndServe(k.String("listen"), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
