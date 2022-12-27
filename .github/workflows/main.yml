@@ -30,10 +30,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Go environment
-        uses: actions/setup-go@v2.1.4
+        uses: actions/setup-go@v3
         with:
           # The Go version to download (if necessary) and use. Supports semver spec and ranges.
           go-version: 1.19
