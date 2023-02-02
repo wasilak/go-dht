@@ -1,0 +1,16 @@
+[Unit]
+Description="DHT11/22 prometheus exporter"
+Documentation=https://github.com/wasilak/go-dht
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+User=root
+Group=root
+Environment=GO_DHT_PIN=27
+ExecStart=/usr/local/bin/go-dht
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -12,10 +14,12 @@ import (
 	"github.com/prokopparuzek/go-dht"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 var k = koanf.New(".")
+
+var logger zerolog.Logger
 
 func recordMetrics(dhtInstance *dht.DHT, pin string, model string) {
 	var err error
@@ -32,19 +36,19 @@ func recordMetrics(dhtInstance *dht.DHT, pin string, model string) {
 
 	err = prometheus.Register(temperatureMetric)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
 	}
 
 	err = prometheus.Register(humidityMetric)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
 	}
 
 	go func() {
 		for {
 			humidity, temperature, err := dhtRun(dhtInstance, 10)
 			if err != nil {
-				log.Error(err)
+				logger.Error().Msg(err.Error())
 			}
 
 			temperatureMetric.With(prometheus.Labels{
@@ -82,12 +86,23 @@ func dhtRun(dht *dht.DHT, retry int) (float64, float64, error) {
 		return 0, 0, fmt.Errorf("read error: %s", err)
 	}
 
-	log.Debugf("temperature: %v, humidity: %v", temperature, humidity)
+	logger.Debug().Msg(fmt.Sprintf("temperature: %v, humidity: %v", temperature, humidity))
 
 	return humidity, temperature, nil
 }
 
 func main() {
+
+	buildInfo, _ := debug.ReadBuildInfo()
+
+	logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
+		Level(zerolog.TraceLevel).
+		With().
+		Timestamp().
+		Caller().
+		Int("pid", os.Getpid()).
+		Str("go_version", buildInfo.GoVersion).
+		Logger()
 
 	k.Load(confmap.Provider(map[string]interface{}{
 		"pin":    "27",
@@ -105,12 +120,12 @@ func main() {
 	model := k.String("model")
 
 	if k.Bool("debug") {
-		log.SetLevel(log.DebugLevel)
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
 	}
 
 	recordMetrics(dhtInstance, pin, model)
@@ -119,6 +134,6 @@ func main() {
 
 	err = http.ListenAndServe(k.String("listen"), nil)
 	if err != nil {
-		log.Fatal(err)
+		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
 	}
 }
