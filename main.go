@@ -21,6 +21,8 @@ var k = koanf.New(".")
 
 var logger zerolog.Logger
 
+var version string
+
 func recordMetrics(dhtInstance *dht.DHT, pin string, model string) {
 	var err error
 
@@ -94,6 +96,11 @@ func dhtRun(dht *dht.DHT, retry int) (float64, float64, error) {
 func main() {
 
 	buildInfo, _ := debug.ReadBuildInfo()
+
+	if os.Args[1] == "version" {
+		fmt.Printf("go-dht\nVersion %s\n", version)
+		os.Exit(0)
+	}
 
 	logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
 		Level(zerolog.TraceLevel).

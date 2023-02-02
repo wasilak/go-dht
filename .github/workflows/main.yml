@@ -43,7 +43,7 @@ jobs:
           # token: # optional, default is ${{ github.token }}
 
       - name: Build executable
-        run: go build -o ./dist/go-dht
+        run: go build -ldflags "-X main.version=${{  github.ref_name }}" -o ./dist/go-dht
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
