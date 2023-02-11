@@ -97,7 +97,7 @@ func main() {
 
 	buildInfo, _ := debug.ReadBuildInfo()
 
-	if len(os.Args) > 0 && os.Args[1] == "version" {
+	if len(os.Args) > 1 && os.Args[1] == "version" {
 		fmt.Printf("go-dht\nVersion %s\n", version)
 		os.Exit(0)
 	}
