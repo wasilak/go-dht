@@ -26,6 +26,9 @@ jobs:
       matrix:
         os: [linux, darwin]
         arch: [amd64, arm64, arm]
+        exclude:
+          - os: darwin
+            platform: arm
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
