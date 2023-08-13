@@ -26,6 +26,16 @@ jobs:
       matrix:
         os: [linux, darwin]
         arch: [amd64, arm64, arm]
+        include:
+          - os: linux
+            arch: arm
+            goarm: 5
+          - os: linux
+            arch: arm
+            goarm: 6
+          - os: linux
+            arch: arm
+            goarm: 7
         exclude:
           - os: darwin
             arch: arm
@@ -47,11 +57,21 @@ jobs:
 
       - name: Build executable
         run: go build -ldflags "-X main.version=${{  github.ref_name }}" -o ./dist/go-dht
+        if: matrix.arch == 'arm'
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
+          GOARM: ${{ matrix.goarm }}
+
+      - name: compress executable (arm)
+        if: matrix.arch == 'arm'
+        run: |
+          cd ./dist
+          chmod +x go-dht
+          zip go-dht-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.goarm }}.zip go-dht
 
       - name: compress executable
+        if: matrix.arch != 'arm'
         run: |
           cd ./dist
           chmod +x go-dht

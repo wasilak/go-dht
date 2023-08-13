@@ -6,7 +6,6 @@ require (
 	github.com/knadh/koanf v1.5.0
 	github.com/prokopparuzek/go-dht v0.1.1
 	github.com/prometheus/client_golang v1.16.0
-	github.com/rs/zerolog v1.30.0
 	github.com/wasilak/loggergo v0.0.11
 )
 
@@ -14,8 +13,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect

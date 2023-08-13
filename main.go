@@ -14,7 +14,6 @@ import (
 	"github.com/prokopparuzek/go-dht"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/rs/zerolog"
 	"github.com/wasilak/loggergo"
 
 	"log/slog"
@@ -121,10 +120,6 @@ func main() {
 	model := k.String("model")
 
 	loggergo.LoggerInit(k.String("logLevel"), k.String("logFormat"), slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
-
-	if k.Bool("debug") {
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	}
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
