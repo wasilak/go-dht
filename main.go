@@ -15,11 +15,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/zerolog"
+	"github.com/wasilak/loggergo"
+
+	"log/slog"
 )
 
 var k = koanf.New(".")
-
-var logger zerolog.Logger
 
 var version string
 
@@ -38,19 +39,19 @@ func recordMetrics(dhtInstance *dht.DHT, pin string, model string) {
 
 	err = prometheus.Register(temperatureMetric)
 	if err != nil {
-		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
+		slog.Error(err.Error())
 	}
 
 	err = prometheus.Register(humidityMetric)
 	if err != nil {
-		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
+		slog.Error(err.Error())
 	}
 
 	go func() {
 		for {
 			humidity, temperature, err := dhtRun(dhtInstance, 10)
 			if err != nil {
-				logger.Error().Msg(err.Error())
+				slog.Error(err.Error())
 			}
 
 			temperatureMetric.With(prometheus.Labels{
@@ -88,7 +89,7 @@ func dhtRun(dht *dht.DHT, retry int) (float64, float64, error) {
 		return 0, 0, fmt.Errorf("read error: %s", err)
 	}
 
-	logger.Debug().Msg(fmt.Sprintf("temperature: %v, humidity: %v", temperature, humidity))
+	slog.Debug(fmt.Sprintf("temperature: %v, humidity: %v", temperature, humidity))
 
 	return humidity, temperature, nil
 }
@@ -102,20 +103,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
-		Level(zerolog.TraceLevel).
-		With().
-		Timestamp().
-		Caller().
-		Int("pid", os.Getpid()).
-		Str("go_version", buildInfo.GoVersion).
-		Logger()
-
 	k.Load(confmap.Provider(map[string]interface{}{
-		"pin":    "27",
-		"model":  "dht22",
-		"debug":  true,
-		"listen": ":9877",
+		"pin":       "27",
+		"model":     "dht22",
+		"debug":     true,
+		"listen":    ":9877",
+		"logLevel":  "info",
+		"logFormat": "json",
 	}, "."), nil)
 
 	k.Load(env.Provider("GO_DHT_", ".", func(s string) string {
@@ -126,13 +120,15 @@ func main() {
 	pin := k.String("pin")
 	model := k.String("model")
 
+	loggergo.LoggerInit(k.String("logLevel"), k.String("logFormat"), slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
+
 	if k.Bool("debug") {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	}
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
-		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
+		slog.Error(err.Error())
 	}
 
 	recordMetrics(dhtInstance, pin, model)
@@ -141,6 +137,6 @@ func main() {
 
 	err = http.ListenAndServe(k.String("listen"), nil)
 	if err != nil {
-		logger.WithLevel(zerolog.FatalLevel).Msg(err.Error())
+		slog.Error(err.Error())
 	}
 }
