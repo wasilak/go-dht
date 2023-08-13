@@ -26,6 +26,7 @@ jobs:
       matrix:
         os: [linux, darwin]
         arch: [amd64, arm64, arm]
+        goarm: [na]
         include:
           - os: linux
             arch: arm
@@ -63,14 +64,14 @@ jobs:
           GOARM: ${{ matrix.goarm }}
 
       - name: compress executable (arm)
-        if: matrix.arch == 'arm'
+        if: matrix.goarm != 'na'
         run: |
           cd ./dist
           chmod +x go-dht
           zip go-dht-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.goarm }}.zip go-dht
 
       - name: compress executable
-        if: matrix.arch != 'arm'
+        if: matrix.goarm == 'na'
         run: |
           cd ./dist
           chmod +x go-dht
