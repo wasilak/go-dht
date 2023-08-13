@@ -107,8 +107,8 @@ func main() {
 		"model":     "dht22",
 		"debug":     true,
 		"listen":    ":9877",
-		"logLevel":  "info",
-		"logFormat": "json",
+		"loglevel":  "info",
+		"logformat": "json",
 	}, "."), nil)
 
 	k.Load(env.Provider("GO_DHT_", ".", func(s string) string {
@@ -119,7 +119,7 @@ func main() {
 	pin := k.String("pin")
 	model := k.String("model")
 
-	loggergo.LoggerInit(k.String("logLevel"), k.String("logFormat"), slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
+	loggergo.LoggerInit(k.String("loglevel"), k.String("logformat"), slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
