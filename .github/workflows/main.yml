@@ -57,7 +57,6 @@ jobs:
 
       - name: Build executable
         run: go build -ldflags "-X main.version=${{  github.ref_name }}" -o ./dist/go-dht
-        if: matrix.arch == 'arm'
         env:
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
