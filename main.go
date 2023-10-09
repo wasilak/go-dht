@@ -119,7 +119,12 @@ func main() {
 	pin := k.String("pin")
 	model := k.String("model")
 
-	loggergo.LoggerInit(k.String("loglevel"), k.String("logformat"), slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
+	loggerConfig := loggergo.LoggerGoConfig{
+		Level:  k.String("loglevel"),
+		Format: k.String("logformat"),
+	}
+
+	loggergo.LoggerInit(loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
