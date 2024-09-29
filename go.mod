@@ -8,7 +8,7 @@ require (
 	github.com/knadh/koanf/v2 v2.1.1
 	github.com/prokopparuzek/go-dht v0.1.1
 	github.com/prometheus/client_golang v1.20.4
-	github.com/wasilak/loggergo v1.5.0
+	github.com/wasilak/loggergo v1.5.1
 )
 
 require (
