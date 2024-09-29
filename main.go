@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/env"
+	"github.com/knadh/koanf/v2"
 	"github.com/prokopparuzek/go-dht"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
