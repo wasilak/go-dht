@@ -4,8 +4,13 @@
     "config:recommended"
   ],
   "labels": [
-    "dependencies",
-    "renovate"
+    "renovate::dependencies",
+    "{{#if category}}renovate::{{category}}{{/if}}",
+    "{{#if updateType}}renovate::{{updateType}}{{/if}}",
+    "{{#if datasource}}renovate::{{datasource}}{{/if}}",
+    "{{#if manager}}renovate::{{manager}}{{/if}}",
+    "{{#if vulnerabilitySeverity}}renovate::{{vulnerabilitySeverity}}{{/if}}",
+    "renovate::{{#if isVulnerabilityAlert}}vulnerability{{else}}not-vulnerability{{/if}}"
   ],
   "pinDigests": false,
   "enabled": true,
@@ -20,17 +25,6 @@
         {
           "gomodTidy": true
         }
-      ],
-      "labels": [
-        "go"
-      ]
-    },
-    {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "labels": [
-        "github-actions"
       ]
     }
   ]
