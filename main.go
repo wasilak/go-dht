@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
@@ -94,6 +95,7 @@ func dhtRun(dht *dht.DHT, retry int) (float64, float64, error) {
 }
 
 func main() {
+	ctx := context.Background()
 
 	buildInfo, _ := debug.ReadBuildInfo()
 
@@ -119,12 +121,12 @@ func main() {
 	pin := k.String("pin")
 	model := k.String("model")
 
-	loggerConfig := loggergo.LoggerGoConfig{
-		Level:  k.String("loglevel"),
-		Format: k.String("logformat"),
+	loggerConfig := loggergo.Config{
+		Level:  loggergo.LogLevelFromString(k.String("loglevel")),
+		Format: loggergo.LogFormatFromString(k.String("logformat")),
 	}
 
-	loggergo.LoggerInit(loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
+	loggergo.LoggerInit(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
