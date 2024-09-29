@@ -3,8 +3,35 @@
   "extends": [
     "config:recommended"
   ],
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
   "pinDigests": false,
   "enabled": true,
   "separateMajorMinor": true,
-  "automerge": true
+  "automerge": true,
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gomod"
+      ],
+      "postUpdateOptions": [
+        {
+          "gomodTidy": true
+        }
+      ],
+      "labels": [
+        "go"
+      ]
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "labels": [
+        "github-actions"
+      ]
+    }
+  ]
 }
