@@ -8,7 +8,7 @@ require (
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/prokopparuzek/go-dht v0.1.1
 	github.com/prometheus/client_golang v1.20.5
-	github.com/wasilak/loggergo v1.5.3
+	github.com/wasilak/loggergo v1.5.4
 )
 
 require (
@@ -35,7 +35,7 @@ require (
 	github.com/samber/lo v1.47.0 // indirect
 	github.com/samber/slog-multi v1.2.4 // indirect
 	github.com/wasilak/otelgo v1.1.1 // indirect
-	gitlab.com/greyxor/slogor v1.5.0 // indirect
+	gitlab.com/greyxor/slogor v1.5.1 // indirect
 	go.opentelemetry.io/contrib/bridges/otelslog v0.7.0 // indirect
 	go.opentelemetry.io/otel v1.32.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.8.0 // indirect
