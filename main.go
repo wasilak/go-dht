@@ -16,6 +16,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/wasilak/loggergo"
+	loggergoLib "github.com/wasilak/loggergo/lib"
+	loggergoTypes "github.com/wasilak/loggergo/lib/types"
 
 	"log/slog"
 )
@@ -121,12 +123,12 @@ func main() {
 	pin := k.String("pin")
 	model := k.String("model")
 
-	loggerConfig := loggergo.Config{
-		Level:  loggergo.LogLevelFromString(k.String("loglevel")),
-		Format: loggergo.LogFormatFromString(k.String("logformat")),
+	loggerConfig := loggergoTypes.Config{
+		Level:  loggergoLib.LogLevelFromString(k.String("loglevel")),
+		Format: loggergoLib.LogFormatFromString(k.String("logformat")),
 	}
 
-	loggergo.LoggerInit(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
+	loggergo.Init(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
 	dhtInstance, err := dhtSetup(pin, model)
 	if err != nil {
