@@ -9,7 +9,7 @@ require (
 	github.com/knadh/koanf/providers/env v1.0.0
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/prokopparuzek/go-dht v0.1.1
-	github.com/prometheus/client_golang v1.21.0
+	github.com/prometheus/client_golang v1.21.1
 	github.com/wasilak/loggergo v1.7.4
 )
 
