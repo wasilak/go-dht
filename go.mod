@@ -9,7 +9,7 @@ require (
 	github.com/knadh/koanf/providers/env v1.0.0
 	github.com/knadh/koanf/v2 v2.1.2
 	github.com/prokopparuzek/go-dht v0.1.1
-	github.com/prometheus/client_golang v1.21.1
+	github.com/prometheus/client_golang v1.22.0
 	github.com/wasilak/loggergo v1.7.4
 )
 
@@ -24,7 +24,7 @@ require (
 	github.com/golang-cz/devslog v0.0.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1 // indirect
-	github.com/klauspost/compress v1.17.11 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/knadh/koanf/maps v0.1.1 // indirect
 	github.com/lmittmann/tint v1.0.7 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
