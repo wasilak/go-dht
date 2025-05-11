@@ -2,7 +2,7 @@ module github.com/wasilak/go-dht
 
 go 1.24
 
-toolchain go1.24.2
+toolchain go1.24.3
 
 require (
 	github.com/knadh/koanf/providers/confmap v1.0.0
@@ -31,12 +31,12 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.62.0 // indirect
-	github.com/prometheus/procfs v0.15.1 // indirect
+	github.com/prometheus/client_model v0.6.2 // indirect
+	github.com/prometheus/common v0.63.0 // indirect
+	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/samber/lo v1.50.0 // indirect
 	github.com/samber/slog-multi v1.4.0 // indirect
-	github.com/wasilak/otelgo v1.2.4 // indirect
+	github.com/wasilak/otelgo v1.2.5 // indirect
 	github.com/xybor-x/enum v1.4.0 // indirect
 	gitlab.com/greyxor/slogor v1.6.2 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
@@ -59,6 +59,6 @@ require (
 	google.golang.org/grpc v1.72.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	periph.io/x/conn/v3 v3.7.1 // indirect
-	periph.io/x/host/v3 v3.8.2 // indirect
+	periph.io/x/conn/v3 v3.7.2 // indirect
+	periph.io/x/host/v3 v3.8.5 // indirect
 )
