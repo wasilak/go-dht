@@ -126,6 +126,8 @@ github.com/wasilak/loggergo v1.7.5 h1:vYGtdlH/uga5JAe/S+xZLhKb+6gHKsfLYrHPq7nuPv
 github.com/wasilak/loggergo v1.7.5/go.mod h1:+YUG/MWCvcBf6NA1LWe/jxkEs1gxOsL91385qjt20Vg=
 github.com/wasilak/loggergo v1.7.6 h1:08PAikeZxuppK4pl2AT5zpgVCElTPz83X6t07wbBnnU=
 github.com/wasilak/loggergo v1.7.6/go.mod h1:DBYBoT6bb+gN0vmDDDd5kjSIWL7EJPc8LsBuGzkroy4=
+github.com/wasilak/loggergo v1.7.7 h1:c3FdM09LMdBsTifIJv5iqD5d9wSs/p65Pus3SIAHxhg=
+github.com/wasilak/loggergo v1.7.7/go.mod h1:Kf0DY3WXPcxRQ61+GCttDGZ2YBGk4hFX7aL3caBzdD8=
 github.com/wasilak/otelgo v1.1.1 h1:f8p0VYTwSfPl0OC9BwO5r1DkQ/oNt9YoHTy19RQCNjs=
 github.com/wasilak/otelgo v1.1.1/go.mod h1:inPRzMpVWJ54sDHq9Xdg0dhjHWzMME1uP4RSgr1S8lo=
 github.com/wasilak/otelgo v1.2.2 h1:QccVXKykxlno5huxgDonc6T4xoZhcjV59FnHlHrG3bA=
@@ -134,6 +136,8 @@ github.com/wasilak/otelgo v1.2.4 h1:WI32tH2qMPRfcn8ioTz2vzaglYXgGa2lO+4ZkKDhQiI=
 github.com/wasilak/otelgo v1.2.4/go.mod h1:36QzSH7k+kSHy1fjDg1USRfvpssOZWLw1p8LTSfvdWM=
 github.com/wasilak/otelgo v1.2.5 h1:0ByD2q36y+KMShsflMhHIyb2OpakNdL9f5CnSYYI1D8=
 github.com/wasilak/otelgo v1.2.5/go.mod h1:Htb5gj0dYc1TCihcm7/fQ4P7idcEaW6vNbZ8hH78jmA=
+github.com/wasilak/otelgo v1.2.6 h1:3utN2SdjrHmrWAujNUKSyscoOOqQR3Psb570o2Dz24Y=
+github.com/wasilak/otelgo v1.2.6/go.mod h1:Htb5gj0dYc1TCihcm7/fQ4P7idcEaW6vNbZ8hH78jmA=
 github.com/xybor-x/enum v1.4.0 h1:Bcv9amQlSsz+EDJW9feiDxCzzUkP1Bv2Lzwx1BGvGeU=
 github.com/xybor-x/enum v1.4.0/go.mod h1:cBN02xug2E1c3UJjZsF5eBg71usBXxX2ePFUFNOFs9o=
 gitlab.com/greyxor/slogor v1.5.2 h1:ushBskVMbduRt3mWLpIct9mOGAkxnytVNoSn2IHBgXM=
