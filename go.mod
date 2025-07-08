@@ -2,7 +2,7 @@ module github.com/wasilak/go-dht
 
 go 1.24
 
-toolchain go1.24.4
+toolchain go1.24.5
 
 require (
 	github.com/knadh/koanf/providers/confmap v1.0.0
