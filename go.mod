@@ -6,7 +6,7 @@ toolchain go1.25.1
 
 require (
 	github.com/knadh/koanf/providers/confmap v1.0.0
-	github.com/knadh/koanf/providers/env v1.1.0
+	github.com/knadh/koanf/providers/env/v2 v2.0.0
 	github.com/knadh/koanf/providers/env/v2 v2.0.0
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/prokopparuzek/go-dht v0.1.1
