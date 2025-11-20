@@ -43,7 +43,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Go environment ${{ matrix.os }} ${{ matrix.arch }}
         uses: actions/setup-go@v6
