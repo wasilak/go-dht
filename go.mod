@@ -1,8 +1,6 @@
 module github.com/wasilak/go-dht
 
-go 1.24.0
-
-toolchain go1.25.4
+go 1.25.4
 
 require (
 	github.com/knadh/koanf/providers/confmap v1.0.0
@@ -11,7 +9,7 @@ require (
 	github.com/knadh/koanf/v2 v2.3.0
 	github.com/prokopparuzek/go-dht v0.1.1
 	github.com/prometheus/client_golang v1.23.2
-	github.com/wasilak/loggergo v1.7.9
+	github.com/wasilak/loggergo v1.8.0
 )
 
 require (
@@ -39,7 +37,7 @@ require (
 	github.com/prometheus/procfs v0.16.1 // indirect
 	github.com/samber/lo v1.52.0 // indirect
 	github.com/samber/slog-common v0.19.0 // indirect
-	github.com/samber/slog-multi v1.5.0 // indirect
+	github.com/samber/slog-multi v1.6.0 // indirect
 	github.com/wasilak/otelgo v1.2.6 // indirect
 	github.com/xybor-x/enum v1.4.0 // indirect
 	gitlab.com/greyxor/slogor v1.6.2 // indirect
@@ -54,14 +52,14 @@ require (
 	go.opentelemetry.io/otel/sdk v1.38.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.14.0 // indirect
 	go.opentelemetry.io/otel/trace v1.38.0 // indirect
-	go.opentelemetry.io/proto/otlp v1.8.0 // indirect
+	go.opentelemetry.io/proto/otlp v1.9.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
-	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20251029180050-ab9386a59fda // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
-	google.golang.org/grpc v1.76.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251111163417-95abcf5c77ba // indirect
+	google.golang.org/grpc v1.77.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
