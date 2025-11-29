@@ -179,6 +179,8 @@ github.com/wasilak/loggergo v1.7.9 h1:758DngWFs7pZsc/ayQ2P/0iV4pTCTeZetonWSbKH9M
 github.com/wasilak/loggergo v1.7.9/go.mod h1:sNcVvGqIfNwHD8algTv7dx6O3RksmbyiXV+RCiJ4068=
 github.com/wasilak/loggergo v1.8.0 h1:26ebKEcjMenwpsH1PXntqtoROzdDJ3lSfRZuDVhxGAQ=
 github.com/wasilak/loggergo v1.8.0/go.mod h1:KUG4KyvjMWqoY+442q6CbEP/gQChC6j2LZADZrPSVOQ=
+github.com/wasilak/loggergo v1.8.1 h1:afBvsXdPiPrRGUDXNkeY9ySrM3ffqeBES8pP/psgW8s=
+github.com/wasilak/loggergo v1.8.1/go.mod h1:U34J7Q04+QrV646J1WRK22IcRRlpQBXXF8G73X58IvM=
 github.com/wasilak/otelgo v1.1.1 h1:f8p0VYTwSfPl0OC9BwO5r1DkQ/oNt9YoHTy19RQCNjs=
 github.com/wasilak/otelgo v1.1.1/go.mod h1:inPRzMpVWJ54sDHq9Xdg0dhjHWzMME1uP4RSgr1S8lo=
 github.com/wasilak/otelgo v1.2.2 h1:QccVXKykxlno5huxgDonc6T4xoZhcjV59FnHlHrG3bA=
@@ -189,6 +191,8 @@ github.com/wasilak/otelgo v1.2.5 h1:0ByD2q36y+KMShsflMhHIyb2OpakNdL9f5CnSYYI1D8=
 github.com/wasilak/otelgo v1.2.5/go.mod h1:Htb5gj0dYc1TCihcm7/fQ4P7idcEaW6vNbZ8hH78jmA=
 github.com/wasilak/otelgo v1.2.6 h1:3utN2SdjrHmrWAujNUKSyscoOOqQR3Psb570o2Dz24Y=
 github.com/wasilak/otelgo v1.2.6/go.mod h1:Htb5gj0dYc1TCihcm7/fQ4P7idcEaW6vNbZ8hH78jmA=
+github.com/wasilak/otelgo v1.3.0 h1:iUAP/m/U91x6Z5W5iHjFt0QuC5Viv4nOeW1L83CkVBU=
+github.com/wasilak/otelgo v1.3.0/go.mod h1:C07kM4sboOSCRzx+gWf8neuTO8tNoIlBwMUAcbPUWgo=
 github.com/xybor-x/enum v1.4.0 h1:Bcv9amQlSsz+EDJW9feiDxCzzUkP1Bv2Lzwx1BGvGeU=
 github.com/xybor-x/enum v1.4.0/go.mod h1:cBN02xug2E1c3UJjZsF5eBg71usBXxX2ePFUFNOFs9o=
 gitlab.com/greyxor/slogor v1.5.2 h1:ushBskVMbduRt3mWLpIct9mOGAkxnytVNoSn2IHBgXM=
@@ -376,6 +380,8 @@ google.golang.org/genproto/googleapis/api v0.0.0-20251029180050-ab9386a59fda h1:
 google.golang.org/genproto/googleapis/api v0.0.0-20251029180050-ab9386a59fda/go.mod h1:fDMmzKV90WSg1NbozdqrE64fkuTv6mlq2zxo9ad+3yo=
 google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba h1:B14OtaXuMaCQsl2deSvNkyPKIzq3BjfxQp8d00QyWx4=
 google.golang.org/genproto/googleapis/api v0.0.0-20251111163417-95abcf5c77ba/go.mod h1:G5IanEx8/PgI9w6CFcYQf7jMtHQhZruvfM1i3qOqk5U=
+google.golang.org/genproto/googleapis/api v0.0.0-20251124214823-79d6a2a48846 h1:ZdyUkS9po3H7G0tuh955QVyyotWvOD4W0aEapeGeUYk=
+google.golang.org/genproto/googleapis/api v0.0.0-20251124214823-79d6a2a48846/go.mod h1:Fk4kyraUvqD7i5H6S43sj2W98fbZa75lpZz/eUyhfO0=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697 h1:LWZqQOEjDyONlF1H6afSWpAL/znlREo2tHfLoe+8LMA=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241118233622-e639e219e697/go.mod h1:5uTbfoYQed2U9p3KIj2/Zzm02PYhndfdmML0qC3q3FU=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20241206012308-a4fef0638583 h1:IfdSdTcLFy4lqUQrQJLkLt1PB+AsqVz6lwkWPzWEz10=
@@ -392,6 +398,8 @@ google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda h1:
 google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda/go.mod h1:7i2o+ce6H/6BluujYR+kqX3GKH+dChPTQU19wjRPiGk=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20251111163417-95abcf5c77ba h1:UKgtfRM7Yh93Sya0Fo8ZzhDP4qBckrrxEr2oF5UIVb8=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20251111163417-95abcf5c77ba/go.mod h1:7i2o+ce6H/6BluujYR+kqX3GKH+dChPTQU19wjRPiGk=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20251124214823-79d6a2a48846 h1:Wgl1rcDNThT+Zn47YyCXOXyX/COgMTIdhJ717F0l4xk=
+google.golang.org/genproto/googleapis/rpc v0.0.0-20251124214823-79d6a2a48846/go.mod h1:7i2o+ce6H/6BluujYR+kqX3GKH+dChPTQU19wjRPiGk=
 google.golang.org/grpc v1.68.0 h1:aHQeeJbo8zAkAa3pRzrVjZlbz6uSfeOXlJNQM0RAbz0=
 google.golang.org/grpc v1.68.0/go.mod h1:fmSPC5AsjSBCK54MyHRx48kpOti1/jRfOlwEWywNjWA=
 google.golang.org/grpc v1.68.1 h1:oI5oTa11+ng8r8XMMN7jAOmWfPZWbYpCFaMUTACxkM0=
