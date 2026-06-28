@@ -9,20 +9,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/knadh/koanf/providers/confmap"
-	"github.com/knadh/koanf/providers/env"
-	"github.com/knadh/koanf/v2"
 	"github.com/prokopparuzek/go-dht"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/wasilak/loggergo"
 	loggergoLib "github.com/wasilak/loggergo/lib"
 	loggergoTypes "github.com/wasilak/loggergo/lib/types"
 
 	"log/slog"
 )
-
-var k = koanf.New(".")
 
 var version string
 
@@ -92,38 +89,47 @@ func dhtRun(dht *dht.DHT, retry int) (float64, float64, error) {
 	return humidity, temperature, nil
 }
 
-func main() {
+func newRootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "go-dht",
+		Short: "DHT11/DHT22 Prometheus exporter",
+		RunE:  runServer,
+	}
+
+	cmd.Flags().String("sensors", "default:27:dht22", "comma-separated list of sensors: id:pin:model,...")
+	cmd.Flags().Bool("extended-labels", false, "expose model and pin as additional metric labels")
+	cmd.Flags().String("listen", ":9877", "address to listen on")
+	cmd.Flags().String("loglevel", "info", "log level (debug, info, warn, error)")
+	cmd.Flags().String("logformat", "json", "log format (json, text)")
+
+	viper.BindPFlags(cmd.Flags())
+
+	return cmd
+}
+
+func newVersionCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "version",
+		Short: "Print version",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Printf("go-dht\nVersion %s\n", version)
+		},
+	}
+}
+
+func runServer(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
 
 	buildInfo, _ := debug.ReadBuildInfo()
 
-	if len(os.Args) > 1 && os.Args[1] == "version" {
-		fmt.Printf("go-dht\nVersion %s\n", version)
-		os.Exit(0)
-	}
-
-	k.Load(confmap.Provider(map[string]any{
-		"sensors":        "default:27:dht22",
-		"extended.labels": false,
-		"debug":          true,
-		"listen":         ":9877",
-		"loglevel":       "info",
-		"logformat":      "json",
-	}, "."), nil)
-
-	k.Load(env.Provider("GO_DHT_", ".", func(s string) string {
-		return strings.ReplaceAll(strings.ToLower(
-			strings.TrimPrefix(s, "GO_DHT_")), "_", ".")
-	}), nil)
-
 	loggerConfig := loggergoTypes.Config{
-		Level:  loggergoLib.LogLevelFromString(k.String("loglevel")),
-		Format: loggergoLib.LogFormatFromString(k.String("logformat")),
+		Level:  loggergoLib.LogLevelFromString(viper.GetString("loglevel")),
+		Format: loggergoLib.LogFormatFromString(viper.GetString("logformat")),
 	}
 
 	loggergo.Init(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
-	extendedLabels := k.Bool("extended.labels")
+	extendedLabels := viper.GetBool("extended-labels")
 
 	labelNames := []string{"sensor"}
 	if extendedLabels {
@@ -142,7 +148,7 @@ func main() {
 
 	prometheus.MustRegister(tempGauge, humGauge)
 
-	sensors := parseSensors(k.String("sensors"))
+	sensors := parseSensors(viper.GetString("sensors"))
 
 	for _, sensor := range sensors {
 		dhtInstance, err := dhtSetup(sensor.Pin, sensor.Model)
@@ -155,7 +161,22 @@ func main() {
 
 	http.Handle("/metrics", promhttp.Handler())
 
-	if err := http.ListenAndServe(k.String("listen"), nil); err != nil {
-		slog.Error(err.Error())
+	if err := http.ListenAndServe(viper.GetString("listen"), nil); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func main() {
+	viper.SetEnvPrefix("GO_DHT")
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.AutomaticEnv()
+
+	root := newRootCmd()
+	root.AddCommand(newVersionCmd())
+
+	if err := root.Execute(); err != nil {
+		os.Exit(1)
 	}
 }
