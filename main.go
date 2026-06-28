@@ -24,22 +24,9 @@ import (
 var version string
 
 type sensorConfig struct {
-	ID    string
-	Pin   string
-	Model string
-}
-
-func parseSensors(cfg string) []sensorConfig {
-	var sensors []sensorConfig
-	for _, s := range strings.Split(cfg, ",") {
-		parts := strings.SplitN(strings.TrimSpace(s), ":", 3)
-		if len(parts) != 3 {
-			slog.Error("invalid sensor config, expected id:pin:model", slog.String("sensor", s))
-			continue
-		}
-		sensors = append(sensors, sensorConfig{ID: parts[0], Pin: parts[1], Model: parts[2]})
-	}
-	return sensors
+	ID    string `mapstructure:"id"`
+	Pin   string `mapstructure:"pin"`
+	Model string `mapstructure:"model"`
 }
 
 func recordMetrics(dhtInstance *dht.DHT, sensor sensorConfig, tempGauge, humGauge *prometheus.GaugeVec, extendedLabels bool) {
@@ -96,8 +83,7 @@ func newRootCmd() *cobra.Command {
 		RunE:  runServer,
 	}
 
-	cmd.PersistentFlags().String("config", "", "config file (default: ./go-dht.yaml, ~/.go-dht.yaml, /etc/go-dht/config.yaml)")
-	cmd.Flags().String("sensors", "default:27:dht22", "comma-separated list of sensors: id:pin:model,...")
+	cmd.PersistentFlags().String("config", "", "config file (default: ./go-dht.yaml, ~/.go-dht.yaml, /etc/go-dht/go-dht.yaml)")
 	cmd.Flags().Bool("extended-labels", false, "expose model and pin as additional metric labels")
 	cmd.Flags().String("listen", ":9877", "address to listen on")
 	cmd.Flags().String("loglevel", "info", "log level (debug, info, warn, error)")
@@ -130,6 +116,14 @@ func runServer(cmd *cobra.Command, args []string) error {
 
 	loggergo.Init(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
+	var sensors []sensorConfig
+	if err := viper.UnmarshalKey("sensors", &sensors); err != nil {
+		return fmt.Errorf("invalid sensors config: %w", err)
+	}
+	if len(sensors) == 0 {
+		return fmt.Errorf("no sensors configured")
+	}
+
 	extendedLabels := viper.GetBool("extended-labels")
 
 	labelNames := []string{"sensor"}
@@ -148,8 +142,6 @@ func runServer(cmd *cobra.Command, args []string) error {
 	}, labelNames)
 
 	prometheus.MustRegister(tempGauge, humGauge)
-
-	sensors := parseSensors(viper.GetString("sensors"))
 
 	for _, sensor := range sensors {
 		dhtInstance, err := dhtSetup(sensor.Pin, sensor.Model)
