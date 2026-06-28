@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
 	"runtime/debug"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/prokopparuzek/go-dht"
@@ -29,50 +31,61 @@ type sensorConfig struct {
 	Model string `mapstructure:"model"`
 }
 
-func recordMetrics(dhtInstance *dht.DHT, sensor sensorConfig, tempGauge, humGauge *prometheus.GaugeVec, extendedLabels bool) {
+type gauges struct {
+	temperature *prometheus.GaugeVec
+	humidity    *prometheus.GaugeVec
+	up          *prometheus.GaugeVec
+}
+
+func sensorLabels(sensor sensorConfig, extended bool) prometheus.Labels {
+	labels := prometheus.Labels{"sensor": sensor.ID}
+	if extended {
+		labels["model"] = sensor.Model
+		labels["pin"] = sensor.Pin
+	}
+	return labels
+}
+
+func recordMetrics(dhtInstance *dht.DHT, sensor sensorConfig, g gauges, extendedLabels bool) {
 	go func() {
+		backoff := 10 * time.Second
+		const maxBackoff = 5 * time.Minute
+
 		for {
 			humidity, temperature, err := dhtRun(dhtInstance, 10)
 			if err != nil {
 				slog.Error(err.Error(), slog.String("sensor", sensor.ID))
+				g.up.With(sensorLabels(sensor, extendedLabels)).Set(0)
+				time.Sleep(backoff)
+				backoff = min(backoff*2, maxBackoff)
+				continue
 			}
 
-			labels := prometheus.Labels{"sensor": sensor.ID}
-			if extendedLabels {
-				labels["model"] = sensor.Model
-				labels["pin"] = sensor.Pin
-			}
+			backoff = 10 * time.Second
+			labels := sensorLabels(sensor, extendedLabels)
+			g.up.With(labels).Set(1)
+			g.temperature.With(labels).Set(temperature)
+			g.humidity.With(labels).Set(humidity)
 
-			tempGauge.With(labels).Set(temperature)
-			humGauge.With(labels).Set(humidity)
-
-			time.Sleep(10 * time.Second)
+			time.Sleep(backoff)
 		}
 	}()
 }
 
 func dhtSetup(pin string, model string) (*dht.DHT, error) {
-	err := dht.HostInit()
-	if err != nil {
-		return nil, fmt.Errorf("HostInit error: %s", err)
-	}
-
 	dhtInstance, err := dht.NewDHT(fmt.Sprintf("GPIO%s", pin), dht.Celsius, model)
 	if err != nil {
-		return nil, fmt.Errorf("NewDHT error: %s", err)
+		return nil, fmt.Errorf("NewDHT error: %w", err)
 	}
-
 	return dhtInstance, nil
 }
 
-func dhtRun(dht *dht.DHT, retry int) (float64, float64, error) {
-	humidity, temperature, err := dht.ReadRetry(retry)
+func dhtRun(d *dht.DHT, retry int) (float64, float64, error) {
+	humidity, temperature, err := d.ReadRetry(retry)
 	if err != nil {
-		return 0, 0, fmt.Errorf("read error: %s", err)
+		return 0, 0, fmt.Errorf("read error: %w", err)
 	}
-
-	slog.Debug(fmt.Sprintf("temperature: %v, humidity: %v", temperature, humidity))
-
+	slog.Debug("sensor read", slog.Float64("temperature", temperature), slog.Float64("humidity", humidity))
 	return humidity, temperature, nil
 }
 
@@ -89,7 +102,9 @@ func newRootCmd() *cobra.Command {
 	cmd.Flags().String("loglevel", "info", "log level (debug, info, warn, error)")
 	cmd.Flags().String("logformat", "json", "log format (json, text)")
 
-	viper.BindPFlags(cmd.Flags())
+	if err := viper.BindPFlags(cmd.Flags()); err != nil {
+		panic(fmt.Sprintf("failed to bind flags: %v", err))
+	}
 
 	return cmd
 }
@@ -105,16 +120,24 @@ func newVersionCmd() *cobra.Command {
 }
 
 func runServer(cmd *cobra.Command, args []string) error {
-	ctx := context.Background()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
 
 	buildInfo, _ := debug.ReadBuildInfo()
+	goVersion := "unknown"
+	if buildInfo != nil {
+		goVersion = buildInfo.GoVersion
+	}
 
 	loggerConfig := loggergoTypes.Config{
 		Level:  loggergoLib.LogLevelFromString(viper.GetString("loglevel")),
 		Format: loggergoLib.LogFormatFromString(viper.GetString("logformat")),
 	}
+	loggergo.Init(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", goVersion))
 
-	loggergo.Init(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
+	if err := dht.HostInit(); err != nil {
+		return fmt.Errorf("HostInit error: %w", err)
+	}
 
 	var sensors []sensorConfig
 	if err := viper.UnmarshalKey("sensors", &sensors); err != nil {
@@ -125,39 +148,53 @@ func runServer(cmd *cobra.Command, args []string) error {
 	}
 
 	extendedLabels := viper.GetBool("extended-labels")
-
 	labelNames := []string{"sensor"}
 	if extendedLabels {
 		labelNames = append(labelNames, "model", "pin")
 	}
 
-	tempGauge := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "sensor_temperature",
-		Help: "temperature from sensor",
-	}, labelNames)
+	g := gauges{
+		temperature: prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "sensor_temperature", Help: "temperature from sensor"}, labelNames),
+		humidity:    prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "sensor_humidity", Help: "humidity from sensor"}, labelNames),
+		up:          prometheus.NewGaugeVec(prometheus.GaugeOpts{Name: "sensor_up", Help: "1 if last sensor read succeeded, 0 otherwise"}, labelNames),
+	}
+	prometheus.MustRegister(g.temperature, g.humidity, g.up)
 
-	humGauge := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "sensor_humidity",
-		Help: "humidity from sensor",
-	}, labelNames)
-
-	prometheus.MustRegister(tempGauge, humGauge)
-
+	started := 0
 	for _, sensor := range sensors {
 		dhtInstance, err := dhtSetup(sensor.Pin, sensor.Model)
 		if err != nil {
 			slog.Error(err.Error(), slog.String("sensor", sensor.ID))
 			continue
 		}
-		recordMetrics(dhtInstance, sensor, tempGauge, humGauge, extendedLabels)
+		recordMetrics(dhtInstance, sensor, g, extendedLabels)
+		started++
+	}
+	if started == 0 {
+		return fmt.Errorf("all sensors failed to initialize")
 	}
 
-	http.Handle("/metrics", promhttp.Handler())
+	mux := http.NewServeMux()
+	mux.Handle("/metrics", promhttp.Handler())
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
-	if err := http.ListenAndServe(viper.GetString("listen"), nil); err != nil {
+	srv := &http.Server{Addr: viper.GetString("listen"), Handler: mux}
+
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			slog.Error("shutdown error", slog.String("err", err.Error()))
+		}
+	}()
+
+	slog.Info("starting", slog.String("addr", viper.GetString("listen")))
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
 	}
-
 	return nil
 }
 

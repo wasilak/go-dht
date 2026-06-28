@@ -3,6 +3,8 @@ Description="DHT11/22 prometheus exporter"
 Documentation=https://github.com/wasilak/go-dht
 Requires=network-online.target
 After=network-online.target
+StartLimitIntervalSec=60
+StartLimitBurst=5
 
 [Service]
 User=root
@@ -10,6 +12,9 @@ Group=root
 ExecStart=/usr/local/bin/go-dht --config /etc/go-dht/go-dht.yaml
 KillMode=process
 Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
