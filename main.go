@@ -26,45 +26,41 @@ var k = koanf.New(".")
 
 var version string
 
-func recordMetrics(dhtInstance *dht.DHT, pin string, model string) {
-	var err error
+type sensorConfig struct {
+	ID    string
+	Pin   string
+	Model string
+}
 
-	temperatureMetric := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "sensor_temperature",
-		Help: "temperature from sensor",
-	}, []string{"model", "pin"})
-
-	humidityMetric := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Name: "sensor_humidity",
-		Help: "humidity from sensor",
-	}, []string{"model", "pin"})
-
-	err = prometheus.Register(temperatureMetric)
-	if err != nil {
-		slog.Error(err.Error())
+func parseSensors(cfg string) []sensorConfig {
+	var sensors []sensorConfig
+	for _, s := range strings.Split(cfg, ",") {
+		parts := strings.SplitN(strings.TrimSpace(s), ":", 3)
+		if len(parts) != 3 {
+			slog.Error("invalid sensor config, expected id:pin:model", slog.String("sensor", s))
+			continue
+		}
+		sensors = append(sensors, sensorConfig{ID: parts[0], Pin: parts[1], Model: parts[2]})
 	}
+	return sensors
+}
 
-	err = prometheus.Register(humidityMetric)
-	if err != nil {
-		slog.Error(err.Error())
-	}
-
+func recordMetrics(dhtInstance *dht.DHT, sensor sensorConfig, tempGauge, humGauge *prometheus.GaugeVec, extendedLabels bool) {
 	go func() {
 		for {
 			humidity, temperature, err := dhtRun(dhtInstance, 10)
 			if err != nil {
-				slog.Error(err.Error())
+				slog.Error(err.Error(), slog.String("sensor", sensor.ID))
 			}
 
-			temperatureMetric.With(prometheus.Labels{
-				"model": model,
-				"pin":   pin,
-			}).Set(temperature)
+			labels := prometheus.Labels{"sensor": sensor.ID}
+			if extendedLabels {
+				labels["model"] = sensor.Model
+				labels["pin"] = sensor.Pin
+			}
 
-			humidityMetric.With(prometheus.Labels{
-				"model": model,
-				"pin":   pin,
-			}).Set(humidity)
+			tempGauge.With(labels).Set(temperature)
+			humGauge.With(labels).Set(humidity)
 
 			time.Sleep(10 * time.Second)
 		}
@@ -106,22 +102,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	k.Load(confmap.Provider(map[string]interface{}{
-		"pin":       "27",
-		"model":     "dht22",
-		"debug":     true,
-		"listen":    ":9877",
-		"loglevel":  "info",
-		"logformat": "json",
+	k.Load(confmap.Provider(map[string]any{
+		"sensors":        "default:27:dht22",
+		"extended.labels": false,
+		"debug":          true,
+		"listen":         ":9877",
+		"loglevel":       "info",
+		"logformat":      "json",
 	}, "."), nil)
 
 	k.Load(env.Provider("GO_DHT_", ".", func(s string) string {
-		return strings.Replace(strings.ToLower(
-			strings.TrimPrefix(s, "GO_DHT_")), "_", ".", -1)
+		return strings.ReplaceAll(strings.ToLower(
+			strings.TrimPrefix(s, "GO_DHT_")), "_", ".")
 	}), nil)
-
-	pin := k.String("pin")
-	model := k.String("model")
 
 	loggerConfig := loggergoTypes.Config{
 		Level:  loggergoLib.LogLevelFromString(k.String("loglevel")),
@@ -130,17 +123,39 @@ func main() {
 
 	loggergo.Init(ctx, loggerConfig, slog.Int("pid", os.Getpid()), slog.String("go_version", buildInfo.GoVersion))
 
-	dhtInstance, err := dhtSetup(pin, model)
-	if err != nil {
-		slog.Error(err.Error())
+	extendedLabels := k.Bool("extended.labels")
+
+	labelNames := []string{"sensor"}
+	if extendedLabels {
+		labelNames = append(labelNames, "model", "pin")
 	}
 
-	recordMetrics(dhtInstance, pin, model)
+	tempGauge := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "sensor_temperature",
+		Help: "temperature from sensor",
+	}, labelNames)
+
+	humGauge := prometheus.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "sensor_humidity",
+		Help: "humidity from sensor",
+	}, labelNames)
+
+	prometheus.MustRegister(tempGauge, humGauge)
+
+	sensors := parseSensors(k.String("sensors"))
+
+	for _, sensor := range sensors {
+		dhtInstance, err := dhtSetup(sensor.Pin, sensor.Model)
+		if err != nil {
+			slog.Error(err.Error(), slog.String("sensor", sensor.ID))
+			continue
+		}
+		recordMetrics(dhtInstance, sensor, tempGauge, humGauge, extendedLabels)
+	}
 
 	http.Handle("/metrics", promhttp.Handler())
 
-	err = http.ListenAndServe(k.String("listen"), nil)
-	if err != nil {
+	if err := http.ListenAndServe(k.String("listen"), nil); err != nil {
 		slog.Error(err.Error())
 	}
 }
