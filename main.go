@@ -96,6 +96,7 @@ func newRootCmd() *cobra.Command {
 		RunE:  runServer,
 	}
 
+	cmd.PersistentFlags().String("config", "", "config file (default: ./go-dht.yaml, ~/.go-dht.yaml, /etc/go-dht/config.yaml)")
 	cmd.Flags().String("sensors", "default:27:dht22", "comma-separated list of sensors: id:pin:model,...")
 	cmd.Flags().Bool("extended-labels", false, "expose model and pin as additional metric labels")
 	cmd.Flags().String("listen", ":9877", "address to listen on")
@@ -168,6 +169,25 @@ func runServer(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func initConfig(cmd *cobra.Command) {
+	if cfgFile, _ := cmd.Flags().GetString("config"); cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	} else {
+		viper.SetConfigName("go-dht")
+		viper.SetConfigType("yaml")
+		viper.AddConfigPath(".")
+		viper.AddConfigPath("$HOME")
+		viper.AddConfigPath("/etc/go-dht")
+	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			fmt.Fprintln(os.Stderr, "config error:", err)
+			os.Exit(1)
+		}
+	}
+}
+
 func main() {
 	viper.SetEnvPrefix("GO_DHT")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
@@ -175,6 +195,8 @@ func main() {
 
 	root := newRootCmd()
 	root.AddCommand(newVersionCmd())
+
+	cobra.OnInitialize(func() { initConfig(root) })
 
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
